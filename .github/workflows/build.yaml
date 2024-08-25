@@ -20,7 +20,7 @@ jobs:
 
       - name: Build for Windows
         run: |
-          GOOS=windows GOARCH=amd64 go build -o assinatura-email.exe
+          go build -o assinatura-email.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
