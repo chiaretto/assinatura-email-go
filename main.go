@@ -28,12 +28,17 @@ func main() {
 	registrationEntry := widget.NewEntry()
 	registrationEntry.SetPlaceHolder("Número de Registro: OAB/MG - 123456")
 
+	celularEntry := widget.NewEntry()
+	celularEntry.SetPlaceHolder("Número de Celular: (34) 9 9126-5991")
+
+
 	// Botão para gerar a assinatura
 	generateButton := widget.NewButton("Gerar Assinatura de Email", func() {
 		name := nameEntry.Text
 		email := emailEntry.Text
 		profession := professionEntry.Text
 		registration := registrationEntry.Text
+		celular := celularEntry.Text + " / (34) 3232-6699"
 
 		if name == "" || email == "" || profession == "" {
 			dialog.ShowError(fmt.Errorf("Todos os campos devem ser preenchidos"), w)
@@ -41,7 +46,7 @@ func main() {
 		}
 
 		fileName := fmt.Sprintf("assinatura-%s.png", name)
-		err := generateSignatureImage(name, email, profession, registration, fileName)
+		err := generateSignatureImage(name, email, profession, registration, celular, fileName)
 		if err != nil {
 			dialog.ShowError(fmt.Errorf("Erro ao gerar a assinatura: %v", err), w)
 			return
@@ -56,6 +61,7 @@ func main() {
 		emailEntry,
 		professionEntry,
 		registrationEntry,
+		celularEntry,
 		generateButton,
 	)
 
@@ -64,7 +70,7 @@ func main() {
 	w.ShowAndRun()
 }
 
-func generateSignatureImage(name, email, profession, registration, fileName string) error {
+func generateSignatureImage(name, email, profession, registration, celular, fileName string) error {
 	const width = 2465
 	const height = 439
 
@@ -93,6 +99,12 @@ func generateSignatureImage(name, email, profession, registration, fileName stri
 	dc.DrawStringAnchored(profession+" - "+registration, 300, 198, 0, 0)
 
 	dc.DrawStringAnchored(email, 300, 265, 0, 0)
+
+	err = dc.LoadFontFace("./ArialBold.ttf", 25)
+	if err != nil {
+		return fmt.Errorf("erro ao carregar a fonte: %v", err)
+	}
+	dc.DrawStringAnchored(celular, 900, 148, 0, 0)
 
 	// Salvar a imagem resultante
 	return dc.SavePNG(fileName)
