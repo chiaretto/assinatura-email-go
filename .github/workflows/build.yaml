@@ -25,4 +25,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: assinatura-email-windows
-          path: assinatura-email.exe
+          path: |
+            assinatura-email.exe
+            Arial.ttf
+            ArialBold.ttf
+            modelo-assinatura.png
