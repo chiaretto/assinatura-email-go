@@ -260,11 +260,12 @@ func NewEstimatorApp() *EstimatorApp {
 	
 	return &EstimatorApp{
 		app:           a,
-		window:        a.NewWindow("StackSpot Estimator"),
+		window:        a.NewWindow("StackSpot CNPJ Estimator - Rev 12.2025"),
 		logic:         &LogicService{},
 		selectedLangs: availableLanguages, // Seleciona tudo por padrão
 	}
 }
+
 
 func (e *EstimatorApp) Run() {
 	e.buildUI()
@@ -274,16 +275,23 @@ func (e *EstimatorApp) Run() {
 }
 
 func (e *EstimatorApp) buildUI() {
+
+	// --- 1. Criar o Fundo (Background) ---
+	// A cor #18181C convertida para RGBA é: R=24, G=24, B=28, A=255)
+	bgColor := color.RGBA{R: 235, G: 231, B: 228, A: 255}
+	background := canvas.NewRectangle(bgColor)
+
+	// --- Componentes da UI (Seu código original) ---
+
 	// Header
-	headerText := canvas.NewText("StackSpot - Estimativa Horas PS", color.Black)
-	headerText.TextSize = 24
-	headerText.TextStyle = fyne.TextStyle{Bold: true}
-	headerContainer := container.NewCenter(headerText)
+	headerImage := canvas.NewImageFromFile("logo2.png")
+	headerImage.FillMode = canvas.ImageFillOriginal
+	headerContainer := container.NewCenter(headerImage)
 
 	// Inputs
 	e.entryDir = widget.NewEntry()
 	e.entryDir.SetPlaceHolder("Selecione um diretório...")
-	
+
 	btnBrowser := widget.NewButton("BROWSER", e.openBrowserDialog)
 	dirContainer := container.NewBorder(nil, nil, nil, btnBrowser, e.entryDir)
 
@@ -294,21 +302,22 @@ func (e *EstimatorApp) buildUI() {
 
 	e.entryVar = widget.NewEntry()
 	e.entryVar.SetText(strings.Join(defaultVariables, ", "))
-	e.entryVar.MultiLine = true 
+	e.entryVar.MultiLine = true
 	e.entryVar.Wrapping = fyne.TextWrapWord
 
 	// Botão Principal
 	btnEstimar := widget.NewButton("ESTIMAR PROJETO", e.runEstimation)
 	btnEstimar.Importance = widget.HighImportance
 
-	// Layout Principal
+	// Layout do Formulário
 	form := widget.NewForm(
 		widget.NewFormItem("Diretório do Projeto", dirContainer),
 		widget.NewFormItem("Linguagens Alvo", langContainer),
 		widget.NewFormItem("Variáveis (Busca)", e.entryVar),
 	)
 
-	content := container.NewVBox(
+	// Conteúdo Principal (VBox)
+	mainContent := container.NewVBox(
 		headerContainer,
 		layout.NewSpacer(),
 		form,
@@ -316,7 +325,17 @@ func (e *EstimatorApp) buildUI() {
 		container.NewPadded(btnEstimar),
 	)
 
-	e.window.SetContent(container.NewPadded(content))
+	// --- 2. Montagem Final ---
+	// Usamos container.NewMax para empilhar:
+	// Camada 1 (Fundo): O retângulo cinza escuro
+	// Camada 2 (Frente): O seu conteúdo com Padding
+	
+	finalLayout := container.NewMax(
+		background, 
+		container.NewPadded(mainContent),
+	)
+
+	e.window.SetContent(finalLayout)
 }
 
 // Actions
@@ -393,11 +412,13 @@ func (e *EstimatorApp) showReport(res AnalysisResult) {
 	totalFiles := 0
 	totalFilesVar := 0
 	totalOccur := 0
+	totalMinutes := 0
 
 	for _, row := range res.Rows {
 		totalFiles += row.Files
 		totalFilesVar += row.FilesWithVar
 		totalOccur += row.Occurrences
+		totalMinutes += row.EstimatedMinutes
 
 		addCell(row.Language, false)
 		addCell(fmt.Sprintf("%d", row.Files), false)
@@ -411,7 +432,7 @@ func (e *EstimatorApp) showReport(res AnalysisResult) {
 	addCell(fmt.Sprintf("%d", totalFiles), true)
 	addCell(fmt.Sprintf("%d", totalFilesVar), true)
 	addCell(fmt.Sprintf("%d", totalOccur), true)
-	addCell(fmt.Sprintf("%s", formatMinutesToHHMM(res.TotalMinutes)), true)
+	addCell(fmt.Sprintf("%s", formatMinutesToHHMM(totalMinutes)), true)
 
 	// 3. Footer Total
 	totalStr := formatMinutesToHHMM(res.TotalMinutes)
