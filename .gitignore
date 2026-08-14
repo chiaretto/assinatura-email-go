@@ -1,0 +1,10 @@
+# Assinaturas geradas pelo aplicativo
+assinatura-*.png
+
+# Binários compilados
+assinatura-email
+assinatura-email.exe
+
+# Artefatos de teste e cobertura
+*.test
+*.out

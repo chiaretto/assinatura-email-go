@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	fyne.io/fyne/v2 v2.5.1
 	github.com/fogleman/gg v1.3.0
+	golang.org/x/image v0.19.0
 )
 
 require (
@@ -32,7 +33,6 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/yuin/goldmark v1.7.4 // indirect
-	golang.org/x/image v0.19.0 // indirect
 	golang.org/x/mobile v0.0.0-20240806205939-81131f6468ab // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
